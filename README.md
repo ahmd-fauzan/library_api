@@ -11,7 +11,7 @@
 ### 1. Build Services
 For each service (`user-service`, `book-service`, `order-service`):
 ```bash
-mvn package
+mvn clean package
 ```
 This will generate the JAR files required for Docker to build images.
 
