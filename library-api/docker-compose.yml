@@ -1,0 +1,92 @@
+networks:
+  library_app_network:
+    driver: bridge
+    
+services:
+  db:
+    container_name: postgres_container
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "5432:5432"
+    networks:
+      - library_app_network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  be:
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"
+    networks:
+      - library_app_network
+
+  book-service:
+    container_name: book-service
+    build:
+      context: ./book-service
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    networks:
+      - library_app_network
+    restart: on-failure
+    environment:
+      - POSTGRESQL_HOST=postgres_container
+      - POSTGRESQL_PORT=5432
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=1234
+
+  user-service:
+    container_name: user-service
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    networks:
+      - library_app_network
+    restart: on-failure
+    environment:
+      - POSTGRESQL_HOST=postgres_container
+      - POSTGRESQL_PORT=5432
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=1234
+
+  order-service:
+    container_name: order-service
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    networks:
+      - library_app_network
+    restart: on-failure
+    environment:
+      - POSTGRESQL_HOST=postgres_container
+      - POSTGRESQL_PORT=5432
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=1234
+
+  gateway:
+    container_name: gateway
+    build: 
+      context: ./gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - library_app_network
+    restart: on-failure
+
+volumes:
+  postgres_data:

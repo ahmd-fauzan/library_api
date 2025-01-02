@@ -1,0 +1,39 @@
+spring:
+  cloud:
+    gateway:
+        routes:
+        -   id: book-service-route
+            uri: ${BOOKS_ROUTE_URI:http://book-service:8081}
+            predicates:
+                - Path=/api/books/**
+            filters:
+                - AddResponseHeader=X-Powered-By,Library Gateway Service
+        -   id: book-service-category-route
+            uri: ${CATEGORY_ROUTE_URI:http://book-service:8081}
+            predicates:
+                - Path=/api/categories/**
+            filters:
+                - AddResponseHeader=X-Powered-By,Library Gateway Service
+        -   id: user-service-route
+            uri: ${USERS_ROUTE_URI:http://user-service:8082}
+            predicates:
+                - Path=/api/users/**
+            filters:
+                - AddResponseHeader=X-Powered-By,Library Gateway Service
+        -   id: order-service-route
+            uri: ${ORDER_ROUTE_URI:http://order-service:8083}
+            predicates:
+                - Path=/api/orders/**
+            filters:
+                - AddResponseHeader=X-Powered-By,Library Gateway Service
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      access: unrestricted
